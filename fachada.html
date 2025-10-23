@@ -1,0 +1,641 @@
+<!-- Chosen Palette: Calm Harmony -->
+<!-- Application Structure Plan: [Estructura adaptada de la "Guía de trabajo UTN". Se mantiene la SPA de una sola página con navegación superior por pestañas (Comprensión, Estructura, Ejemplo, Análisis, Comparativa) para reflejar las secciones de la guía. Esta estructura facilita la consulta rápida y el estudio dirigido por secciones, permitiendo al estudiante navegar por el material de la guía de forma no lineal. Las interacciones (diagrama y toggles) se mantienen para mejorar la didáctica.] -->
+<!-- Visualization & Content Choices: [Report Info: Diagrama UML (descripción) -> Goal: Organizar/Relaciones -> Viz/Method: Diagrama HTML/Tailwind (reutilizado). -> Interaction: Clic en componente muestra descripción actualizada (de la guía 2.2). Justification: Sigue siendo la forma más interactiva de mostrar la estructura. | Report Info: Ejemplo de Código (Checkout) -> Goal: Informar -> Viz/Method: Bloques de código en pestañas. -> Interaction: Clic en pestañas ('Fachada', 'Subsistemas', 'Cliente') para mostrar el nuevo ejemplo de Python. Justification: Descompone el nuevo ejemplo didácticamente. | Report Info: Ventajas/Desv (Guía) -> Goal: Informar -> Viz/Method: Toggles/Acordeón. -> Interaction: Clic para expandir/colapsar. Abiertos por defecto según solicitud. Justification: Organiza la información de forma limpia. | Report Info: Comparativa -> Goal: Comparar -> Viz/Method: Tabla HTML. Justification: Es la forma más clara de presentar una comparativa directa.] -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Interactiva: Patrón Fachada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .nav-link {
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .nav-link.active {
+            background-color: #0c4a6e;
+            color: white;
+        }
+
+        .nav-link:not(.active):hover {
+            background-color: #f1f5f9;
+        }
+
+        .tab-button {
+            cursor: pointer;
+            padding: 10px 16px;
+            border-radius: 8px;
+            background-color: #e2e8f0;
+            transition: background-color 0.3s;
+        }
+
+        .tab-button.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .tab-button:not(.active):hover {
+            background-color: #cbd5e1;
+        }
+
+        .code-content {
+            display: none;
+        }
+
+        .code-content.active {
+            display: block;
+        }
+
+        .diagram-box {
+            border: 2px solid #9ca3af;
+            background-color: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .diagram-box.active {
+            border-color: #3b82f6;
+            background-color: #dbeafe;
+            transform: scale(1.03);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .diagram-arrow {
+            position: relative;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #6b7280;
+            margin: 0.5rem 0;
+        }
+
+        .analisis-toggle {
+            cursor: pointer;
+            background-color: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-weight: 600;
+            width: 100%;
+            text-align: left;
+            transition: background-color 0.3s;
+        }
+
+        .analisis-toggle:hover {
+            background-color: #e5e7eb;
+        }
+
+        .analisis-content {
+            display: none;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            border-top: 0;
+            border-radius: 0 0 8px 8px;
+            padding: 16px;
+        }
+
+        .analisis-content.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body class="bg-stone-100 text-neutral-800">
+
+    <header class="bg-slate-900 text-white p-6 shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <h1 class="text-3xl font-bold">Guía de Trabajo: Patrón Fachada (Facade)</h1>
+            <nav class="mt-4 md:mt-0">
+                <ul class="flex flex-wrap justify-center gap-x-3 gap-y-2">
+                    <li><a class="nav-link active" data-target="comprension">Comprensión</a></li>
+                    <li><a class="nav-link" data-target="estructura">Estructura</a></li>
+                    <li><a class="nav-link" data-target="ejemplo">Ejemplo</a></li>
+                    <li><a class="nav-link" data-target="analisis">Análisis</a></li>
+                    <li><a class="nav-link" data-target="comparativa">Comparativa</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+
+        <section id="comprension" class="content-section active">
+            <div class="bg-white shadow-xl rounded-lg p-6 md:p-10">
+                <h2 class="text-3xl font-bold text-blue-700 mb-6">1. Comprensión del Patrón</h2>
+
+                <div class="space-y-6">
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-5">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">1.1. Nombre del patrón:</h3>
+                        <p class="text-lg">Fachada (Facade)</p>
+                    </div>
+
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-5">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">1.2. Problema que resuelve:</h3>
+                        <p class="text-base md:text-lg">Reduce el alto acoplamiento y la complejidad que surgen cuando
+                            la lógica de negocio debe tratar directamente con un subsistema grande (clases/módulos de
+                            terceros interdependientes). Sin una fachada, el cliente debe conocer detalles internos,
+                            orquestar llamadas y gestionar dependencias, lo que vuelve el código frágil, difícil de
+                            mantener y de entender, además de encarecer las pruebas y limitar la evolución del sistema.
+                        </p>
+                    </div>
+
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-5">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">1.3. Idea principal o solución propuesta:
+                        </h3>
+                        <p class="text-base md:text-lg">La solución consiste en introducir una única clase —la Fachada—
+                            como punto de entrada estable y simplificado al subsistema. Expone una interfaz de alto
+                            nivel con métodos orientados a los casos de uso frecuentes y, por dentro, orquesta la
+                            secuencia de llamadas, adapta parámetros/formatos, maneja errores y delega en las clases
+                            correctas. Así encapsula los detalles y reduce el conocimiento que el cliente necesita sobre
+                            el sistema. Como efecto, se disminuye el acoplamiento, se mejora la cohesión y se facilita
+                            evolucionar o reemplazar componentes internos sin impactar a los consumidores.</p>
+                    </div>
+
+                    <div class="bg-sky-50 border border-sky-200 rounded-lg p-5">
+                        <h3 class="text-xl font-semibold text-sky-800 mb-2">1.4. Tipo de patrón:</h3>
+                        <p class="text-lg font-semibold"><span
+                                class="bg-sky-200 text-sky-900 px-2 py-1 rounded">Estructural</span></p>
+                        <p class="text-base md:text-lg mt-2">
+                            El patrón Facade es de tipo <strong>Estructural</strong>. Pertenece a esta clasificación ya
+                            que su propósito principal es el de organizar y simplificar la estructura de un sistema de
+                            clases o subsistemas complejos, sin cambiar su comportamiento interno.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="estructura" class="content-section">
+            <div class="bg-white shadow-xl rounded-lg p-6 md:p-10">
+                <h2 class="text-3xl font-bold text-blue-700 mb-6">2. Estructura y Participantes</h2>
+                <p class="text-lg text-gray-700 mb-8">
+                    <strong>Haga clic en cada componente del diagrama</strong> para ver su descripción y
+                    responsabilidades, según lo definido en la guía.
+                </p>
+
+                <div class="flex flex-col md:flex-row items-center justify-around gap-4 p-4">
+                    <div id="diagram-client" class="diagram-box w-full md:w-1/4">
+                        Cliente
+                    </div>
+
+                    <div class="diagram-arrow w-full md:w-1/6">→</div>
+
+                    <div id="diagram-facade" class="diagram-box w-full md:w-1/4 !border-blue-500">
+                        Fachada
+                    </div>
+
+                    <div class="diagram-arrow w-full md:w-1/6">→</div>
+
+                    <div class="w-full md:w-1/4 border-2 border-dashed border-gray-400 rounded-lg p-4 bg-gray-50">
+                        <div id="diagram-subsystem1" class="diagram-box !bg-white !border-gray-400 text-sm mb-2">
+                            Clase Subsistema 1
+                        </div>
+                        <div id="diagram-subsystem2" class="diagram-box !bg-white !border-gray-400 text-sm mb-2">
+                            Clase Subsistema 2
+                        </div>
+                        <div id="diagram-subsystem3" class="diagram-box !bg-white !border-gray-400 text-sm">
+                            ... más clases
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-2xl font-semibold text-gray-800 mt-8 mb-4">2.2. Descripción de Participantes</h3>
+                <div class="mt-4 min-h-[150px]">
+                    <div id="desc-client" class="p-6 bg-gray-100 rounded-lg border border-gray-300 diagram-desc hidden">
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-3">Participante: Cliente (Client)</h3>
+                        <p>El <strong>Cliente</strong> es quien utiliza la fachada en lugar de invocar directamente los
+                            objetos del subsistema.</p>
+                    </div>
+                    <div id="desc-facade" class="p-6 bg-blue-50 rounded-lg border border-blue-300 diagram-desc hidden">
+                        <h3 class="text-2xl font-semibold text-blue-800 mb-3">Participante: Fachada (Facade)</h3>
+                        <p>La clase <strong>Facade</strong> proporciona un acceso a una parte específica de la
+                            funcionalidad del subsistema.</p>
+                        <p class="mt-2">Se puede crear una <strong>Fachada Adicional (Additional Facade)</strong> para
+                            evitar contaminar una única fachada con funciones no relacionadas que podrían convertirla en
+                            otra estructura compleja. Estas fachadas adicionales pueden ser utilizadas por clientes y
+                            por otras fachadas.</p>
+                    </div>
+                    <div id="desc-subsystem"
+                        class="p-6 bg-gray-100 rounded-lg border border-gray-300 diagram-desc hidden">
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-3">Participante: Subsistema Complejo</h3>
+                        <p>El <strong>Subsistema Complejo</strong> puede conformarse por una gran cantidad de objetos
+                            diversos, cada uno de ellos debe realizar algo significativo, profundizando en los detalles
+                            de implementación del subsistema.</p>
+                        <p class="mt-2">Estas clases pueden incluir inicializaciones de objetos en el orden correcto y
+                            suministrarles datos en el formato adecuado. Las clases del subsistema <strong>no conocen la
+                                existencia de la fachada</strong>. Operan dentro del sistema y trabajan entre sí
+                            directamente.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="ejemplo" class="content-section">
+            <div class="bg-white shadow-xl rounded-lg p-6 md:p-10">
+                <h2 class="text-3xl font-bold text-blue-700 mb-6">3. Ejemplo Práctico</h2>
+
+                <h3 class="text-2xl font-semibold text-gray-800 mb-3">3.1. Ejemplo en la vida real (Analogía)</h3>
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-5 mb-8">
+                    <p class="text-base md:text-lg">
+                        Haciendo analogía a un objeto de la vida real, podríamos decir que un <strong>control remoto de
+                            TV</strong> cumple un rol de “Facade”, ya que al presionar un simple botón, internamente se
+                        llevan a cabo varios procesos complejos en el dispositivo.
+                    </p>
+                    <p class="text-base md:text-lg mt-2">
+                        Por ejemplo, al presionar el botón de encendido, se activa la pantalla, se ajusta el sonido, se
+                        selecciona una entrada y se busca la fuente de video. El detalle importante es que el usuario
+                        que va a utilizar el televisor no necesita conocer nada de los detalles internos que ocurren.
+                    </p>
+                </div>
+
+                <h3 class="text-2xl font-semibold text-gray-800 mb-3">3.2. Ejemplo técnico (Python)</h3>
+                <p class="text-lg text-gray-700 mb-8">
+                    Ejemplo de un <strong>Checkout de E-commerce</strong>. El cliente solo quiere "completar la orden",
+                    pero la fachada debe orquestar inventario, precios, pagos y envíos.
+                </p>
+
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <button class="tab-button active" data-target="code-1">La Fachada (CheckoutFacade)</button>
+                    <button class="tab-button" data-target="code-2">Los Subsistemas</button>
+                    <button class="tab-button" data-target="code-3">El Cliente</button>
+                </div>
+
+                <div id="code-1" class="code-content active">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-3">Paso 1: La Fachada</h3>
+                    <p class="mb-4">
+                        Interfaz simple que orquesta varios subsistemas. Define el FLUJO de alto nivel (validar →
+                        preparar costos → cobrar → despachar → confirmar).
+                    </p>
+                    <pre class="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code class="language-python">
+from __future__ import annotations
+
+class CheckoutFacade:
+    """
+    Interfaz simple que orquesta varios subsistemas para completar una orden.
+    """
+
+    def __init__(
+        self,
+        inventory: InventoryService | None = None,
+        payments: PaymentGateway | None = None,
+        shipping: ShippingService | None = None,
+        pricing: PricingService | None = None,
+    ) -> None:
+        # El Facade puede recibir instancias externas (útil para tests/mocks)
+        # o crearlas por su cuenta si no se proveen.
+        self._inventory = inventory or InventoryService()
+        self._payments = payments or PaymentGateway()
+        self._shipping = shipping or ShippingService()
+        self._pricing = pricing or PricingService()
+
+    def operation(self) -> str:
+        
+        pasos: list[str] = []
+        pasos.append("Iniciar proceso de checkout")
+
+        # El cliente no necesita conocer el orden exacto: 
+        # el Facade se encarga de todo.
+        pasos.append(self._inventory.check())
+        pasos.append(self._pricing.prepare())
+        pasos.append(self._payments.charge())
+        pasos.append(self._shipping.dispatch())
+        pasos.append(self._inventory.confirm())
+
+        pasos.append("Proceso completado")
+        return "\n".join(pasos)
+                    </code></pre>
+                </div>
+
+                <div id="code-2" class="code-content">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-3">Paso 2: Los Subsistemas</h3>
+                    <p class="mb-4">
+                        Cada subsistema expone una API simple al Facade. Sus detalles internos (consultas, reglas, etc.)
+                        permanecen encapsulados.
+                    </p>
+                    <pre class="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code class="language-python">
+class InventoryService:
+    """Maneja disponibilidad, reservas y confirmaciones."""
+    def check(self) -> str:
+        return "[Inventory] OK"
+    def confirm(self) -> str:
+        return "[Inventory] Confirmado"
+
+class PaymentGateway:
+    """Procesa cobros y reembolsos."""
+    def charge(self) -> str:
+        return "[Payment] Aprobado"
+
+class ShippingService:
+    """Cotiza y gestiona envíos."""
+    def dispatch(self) -> str:
+        return "[Shipping] Despachado"
+
+class PricingService:
+    """Calcula precios, impuestos y descuentos."""
+    def prepare(self) -> str:
+        return "[Pricing] Costos listos"
+                    </code></pre>
+                </div>
+
+                <div id="code-3" class="code-content">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-3">Paso 3: El Cliente</h3>
+                    <p class="mb-4">
+                        El cliente solo necesita el Facade y su operación de alto nivel.
+                    </p>
+                    <pre class="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto"><code class="language-python">
+def client_code(facade: CheckoutFacade) -> None:
+    print(facade.operation(), end="")
+
+if __name__ == "__main__":
+    facade = CheckoutFacade()
+    client_code(facade)
+
+# --- Output ---
+# Iniciar proceso de checkout
+# [Inventory] OK
+# [Pricing] Costos listos
+# [Payment] Aprobado
+# [Shipping] Despachado
+# [Inventory] Confirmado
+# Proceso completado
+                    </code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="analisis" class="content-section">
+            <div class="bg-white shadow-xl rounded-lg p-6 md:p-10">
+                <h2 class="text-3xl font-bold text-blue-700 mb-6">4. Ventajas, Desventajas y Aplicaciones</h2>
+                <p class="text-lg text-gray-700 mb-8">
+                    Análisis de los beneficios, riesgos y casos de uso comunes del patrón Fachada.
+                </p>
+
+                <div class="space-y-4 mb-10">
+                    <div>
+                        <button class="analisis-toggle" data-target="analisis-ventajas">
+                            <span class="text-lg">✅ 4.1. Ventajas</span>
+                        </button>
+                        <div id="analisis-ventajas" class="analisis-content">
+                            <ul class="list-disc list-outside space-y-3 pl-5 text-gray-700">
+                                <li><strong>Oculta la complejidad interna:</strong> El cliente deja de conocer múltiples
+                                    clases del subsistema → menos objetos que aprender y uso más simple.</li>
+                                <li><strong>Fomenta bajo acoplamiento:</strong> Permite modificar componentes internos
+                                    sin romper a los clientes. Ayuda a estructurar en capas, a eliminar dependencias
+                                    complejas/circulares y a reducir dependencias de compilación.</li>
+                                <li><strong>No bloquea el acceso avanzado:</strong> Si hace falta, se puede usar
+                                    directamente alguna clase del subsistema. Da equilibrio entre facilidad de uso (por
+                                    la fachada) y generalidad (acceso directo).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button class="analisis-toggle" data-target="analisis-desventajas">
+                            <span class="text-lg">⚠️ 4.2. Desventajas</span>
+                        </button>
+                        <div id="analisis-desventajas" class="analisis-content">
+                            <ul class="list-disc list-outside space-y-3 pl-5 text-gray-700">
+                                <li><strong>Riesgo de “fachada gigante”:</strong> Si concentra demasiadas
+                                    responsabilidades, viola SRP y se vuelve difícil de mantener.</li>
+                                <li><strong>Capa adicional:</strong> Añade indirección y un pequeño overhead
+                                    (latencia/mantenimiento), irrelevante en general pero a considerar en escenarios
+                                    críticos.</li>
+                                <li><strong>Diseño pobre = API rígida:</strong> Si la interfaz de la fachada es
+                                    demasiado genérica o demasiado estrecha, no agrega valor y puede forzar a
+                                    “saltarla”.</li>
+                                <li><strong>Dependencia centralizada:</strong> Muchos clientes dependen de la misma
+                                    clase; un cambio o bug en la fachada impacta ampliamente.</li>
+                                <li><strong>No arregla el interior:</strong> Oculta malos diseños del subsistema, no los
+                                    corrige.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-3xl font-bold text-blue-700 mb-6">5. Aplicaciones Posibles</h2>
+                <div class="space-y-4">
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-5">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Proveer una interfaz simple para un
+                            subsistema complejo</h3>
+                        <p>Cuando el módulo creció en clases y configuraciones, la Fachada ofrece un punto de entrada
+                            único y de alto nivel que oculta la complejidad y reduce la curva de aprendizaje. Los casos
+                            avanzados pueden, si es necesario, acceder directamente a clases internas.</p>
+                    </div>
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-5">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Reducir dependencias entre clientes y
+                            clases internas (desacoplar)</h3>
+                        <p>Ante muchos vínculos cliente↔subsistema, la Fachada concentra el acceso, disminuye el
+                            acoplamiento y evita dependencias complejas/circulares. Así limita el impacto de cambios
+                            internos (menos recopilaciones/ajustes) y facilita portabilidad y mantenimiento.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparativa" class="content-section">
+            <div class="bg-white shadow-xl rounded-lg p-6 md:p-10">
+                <h2 class="text-3xl font-bold text-blue-700 mb-6">6. Comparativa: Proxy vs. Fachada</h2>
+
+                <p class="text-lg text-gray-700 mb-6">
+                    <strong>Proxy</strong> es un patrón estructural que coloca un sustituto delante de un objeto real
+                    para controlar su acceso manteniendo la <strong>misma interfaz</strong> (el cliente no nota la
+                    diferencia). Se usa cuando el acceso es costoso, remoto o sensible, y queremos añadir políticas
+                    transversales —lazy loading, caché, permisos, logging, reintentos— sin cambiar la API.
+                </p>
+                <p class="text-lg text-gray-700 mb-8">
+                    <strong>Fachada</strong>, en cambio, crea una <strong>nueva interfaz simplificada</strong> para un
+                    conjunto de objetos (un subsistema). No controla el acceso, sino que oculta la complejidad.
+                </p>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[600px] border-collapse">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="border border-gray-400 p-3 text-left text-lg font-semibold">Característica
+                                </th>
+                                <th class="border border-gray-400 p-3 text-left text-lg font-semibold">Proxy</th>
+                                <th class="border border-gray-400 p-3 text-left text-lg font-semibold">Fachada (Facade)
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-700">
+                            <tr class="bg-white">
+                                <td class="border border-gray-300 p-3 font-semibold">Intención</td>
+                                <td class="border border-gray-300 p-3">Controlar el acceso/comportamiento de
+                                    <strong>un</strong> objeto existente.</td>
+                                <td class="border border-gray-300 p-3">Simplificar el acceso a <strong>un subsistema
+                                        completo</strong>.</td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="border border-gray-300 p-3 font-semibold">Interfaz al cliente</td>
+                                <td class="border border-gray-300 p-3">La <strong>misma</strong> que el objeto real
+                                    (transparente).</td>
+                                <td class="border border-gray-300 p-3"><strong>Nueva y simplificada</strong>, orientada
+                                    a casos de uso.</td>
+                            </tr>
+                            <tr class="bg-white">
+                                <td class="border border-gray-300 p-3 font-semibold">Alcance</td>
+                                <td class="border border-gray-300 p-3">1 ↔ 1 (un objeto).</td>
+                                <td class="border border-gray-300 p-3">1 ↔ N (múltiples clases/módulos).</td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="border border-gray-300 p-3 font-semibold">Transparencia</td>
+                                <td class="border border-gray-300 p-3">El cliente no nota si usa proxy u objeto real.
+                                </td>
+                                <td class="border border-gray-300 p-3">No busca transparencia; orquesta pasos internos.
+                                </td>
+                            </tr>
+                            <tr class="bg-white">
+                                <td class="border border-gray-300 p-3 font-semibold">Casos típicos</td>
+                                <td class="border border-gray-300 p-3">Lazy loading, cache, control de permisos, acceso
+                                    remoto/logging.</td>
+                                <td class="border border-gray-300 p-3">API única sobre librería compleja, punto de
+                                    entrada por capas.</td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="border border-gray-300 p-3 font-semibold">Riesgos</td>
+                                <td class="border border-gray-300 p-3">Overhead, incoherencias por cache, complejidad de
+                                    políticas.</td>
+                                <td class="border border-gray-300 p-3">“Fachada gigante”, capa extra innecesaria si el
+                                    subsistema ya es simple.</td>
+                            </tr>
+                            <tr class="bg-white">
+                                <td class="border border-gray-300 p-3 font-semibold">Úsalo cuando…</td>
+                                <td class="border border-gray-300 p-3">Querés añadir control sin cambiar la API del
+                                    objeto.</td>
+                                <td class="border border-gray-300 p-3">Querés ocultar complejidad y reducir acoplamiento
+                                    frente a muchos componentes.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            function setActiveSection(targetId) {
+                contentSections.forEach(section => {
+                    section.classList.toggle('active', section.id === targetId);
+                });
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.dataset.target === targetId);
+                });
+                window.scrollTo(0, 0);
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    setActiveSection(link.dataset.target);
+                });
+            });
+
+            setActiveSection('comprension');
+
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const codeContents = document.querySelectorAll('.code-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+
+                    codeContents.forEach(content => {
+                        content.classList.toggle('active', content.id === targetId);
+                    });
+
+                    tabButtons.forEach(btn => {
+                        btn.classList.toggle('active', btn.dataset.target === targetId);
+                    });
+                });
+            });
+
+            const diagramBoxes = {
+                client: document.getElementById('diagram-client'),
+                facade: document.getElementById('diagram-facade'),
+                subsystem1: document.getElementById('diagram-subsystem1'),
+                subsystem2: document.getElementById('diagram-subsystem2'),
+                subsystem3: document.getElementById('diagram-subsystem3'),
+            };
+
+            const diagramDescs = {
+                client: document.getElementById('desc-client'),
+                facade: document.getElementById('desc-facade'),
+                subsystem: document.getElementById('desc-subsystem'),
+            };
+
+            function showDiagramDesc(descId) {
+                Object.values(diagramDescs).forEach(desc => desc.style.display = 'none');
+                Object.values(diagramBoxes).forEach(box => box.classList.remove('active'));
+
+                if (descId === 'subsystem') {
+                    diagramDescs.subsystem.style.display = 'block';
+                    diagramBoxes.subsystem1.classList.add('active');
+                    diagramBoxes.subsystem2.classList.add('active');
+                    diagramBoxes.subsystem3.classList.add('active');
+                } else if (diagramDescs[descId]) {
+                    diagramDescs[descId].style.display = 'block';
+                    diagramBoxes[descId].classList.add('active');
+                }
+            }
+
+            diagramBoxes.client.addEventListener('click', () => showDiagramDesc('client'));
+            diagramBoxes.facade.addEventListener('click', () => showDiagramDesc('facade'));
+            diagramBoxes.subsystem1.addEventListener('click', () => showDiagramDesc('subsystem'));
+            diagramBoxes.subsystem2.addEventListener('click', () => showDiagramDesc('subsystem'));
+            diagramBoxes.subsystem3.addEventListener('click', () => showDiagramDesc('subsystem'));
+
+            showDiagramDesc('facade');
+            diagramBoxes.facade.classList.add('active');
+            diagramDescs.facade.style.display = 'block';
+
+            const analisisToggles = document.querySelectorAll('.analisis-toggle');
+            analisisToggles.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const targetId = toggle.dataset.target;
+                    const content = document.getElementById(targetId);
+                    if (content) {
+                        content.classList.toggle('active');
+                    }
+                });
+            });
+
+            // Requerimiento: Abrir Ventajas y Desventajas por defecto
+            document.getElementById('analisis-ventajas').classList.add('active');
+            document.getElementById('analisis-desventajas').classList.add('active');
+        });
+    </script>
+</body>
+
+</html>
